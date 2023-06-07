@@ -1,17 +1,28 @@
 #include "game_master.h"
 
+// GLOBAL SCOPE
+
+// PLAYERS
 player P1;
 player P2;
+
+// PLAYERS SHIP COUNT
 int player1_ships_count = 0;
 int player2_ships_count = 0;
 
+
+// BOARD FOR PRINTING
 int player_board_print[10][10] = { 0 };
 int ai_board_print[10][10] = { 0 };
 
+
+// Checks for valid coordinates
 bool isValidCoordinate(int x, int y) {
     return x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE;
 }
 
+
+// Checks for valid placement of ship
 bool isValidPlacement(int x, int y, int rot, player& pl, int size = 1) {
 	if (rot) {
 		for (int i = y; i < y + size; ++i) {
@@ -30,6 +41,8 @@ bool isValidPlacement(int x, int y, int rot, player& pl, int size = 1) {
 	return true;
 }
 
+
+// Place ships for AI and player
 void placeShipOnBoard(int x, int y, int size, int rot, int play) {
 	//if (rot) {
 	//	for (int i = y; i < y + size; ++i) {
@@ -95,6 +108,8 @@ void placeShipOnBoard(int x, int y, int size, int rot, int play) {
 	}
 }
 
+
+// Player places ships
 void placePlayerShip() {
 	for (int i = 0; i < P1.player_ships.size(); ++i) {
 		bool validPlacement = false;
@@ -118,6 +133,8 @@ void placePlayerShip() {
 	}
 }
 
+
+// Random placement of AI's ship
 void placeAiShipsRand() {
 	srand(time(NULL));
 	for (int i = 0; i < P2.player_ships.size(); ++i) {
@@ -135,10 +152,14 @@ void placeAiShipsRand() {
 		}
 	}
 }
+
+// Checks for valid guess
 bool isValidGuess(int x, int y, player& p) {
 	return isValidCoordinate(x, y) && (p.p_board[x][y] >= 0);
 }
 
+
+// Player guesses position
 void playerGuessPosition() {
 	int x, y;
 	cout << "Enter your guess (x, y)";
@@ -164,9 +185,11 @@ void playerGuessPosition() {
 		playerGuessPosition();
 	}
 }
+
+// Guess position by AI
 void aiGuessPosition() {
-	int x = std::rand() % BOARD_SIZE;
-	int y = std::rand() % BOARD_SIZE;
+	int x = rand() % BOARD_SIZE;
+	int y = rand() % BOARD_SIZE;
 
 	if (isValidGuess(x, y, P1)) {
 		if (P1.p_board[x][y] > 0) {
@@ -189,6 +212,8 @@ void aiGuessPosition() {
 	}
 }
 
+
+// Print board of player and Ai's
 void printBoards() {
 	cout << "Player board" << endl << endl;
 	for (int i = 0; i < BOARD_SIZE; i++) {
@@ -223,6 +248,8 @@ void printBoards() {
 		cout << endl << endl;
 	}
 }
+
+// Test Function
 void printenemyboard() {
 	for (int i = 0; i < BOARD_SIZE; i++) {
 		for (int j = 0; j < BOARD_SIZE; j++) {
@@ -231,6 +258,9 @@ void printenemyboard() {
 		cout << endl;
 	}
 }
+
+
+// Checks for victory on either side
 void game_master::VictoryCheck() {
 	int enemy_HP = 0, player_HP = 0;
 	for (auto& t : P2.player_ships) {
@@ -251,21 +281,29 @@ void game_master::VictoryCheck() {
 	}
 }
 
+
+// Game engine
 game_master::game_master() {
+
+	// Initializes player ships
 	ship_1 ship_1_1;
-	//ship_2 ship_2_1;
-	//ship_2 ship_2_2;
-	//ship_3 ship_3_1;
-	//ship_3 ship_3_2;
-	//ship_4 ship_4_1;
+	ship_2 ship_2_1;
+	ship_2 ship_2_2;
+	ship_3 ship_3_1;
+	ship_3 ship_3_2;
+	ship_4 ship_4_1;
 
+
+	// Adds the to player ships vetor
 	P1.player_ships.push_back(ship_1_1);
-	//P1.player_ships.push_back(ship_2_1);
-	//P1.player_ships.push_back(ship_2_2);
-	//P1.player_ships.push_back(ship_3_1);
-	//P1.player_ships.push_back(ship_3_2);
-	//P1.player_ships.push_back(ship_4_1);
+	P1.player_ships.push_back(ship_2_1);
+	P1.player_ships.push_back(ship_2_2);
+	P1.player_ships.push_back(ship_3_1);
+	P1.player_ships.push_back(ship_3_2);
+	P1.player_ships.push_back(ship_4_1);
 
+
+	// Initializes AI's ships
 	ship_1 ai_ship_1_1;
 	ship_2 ai_ship_2_1;
 	ship_2 ai_ship_2_2;
@@ -273,6 +311,8 @@ game_master::game_master() {
 	ship_3 ai_ship_3_2;
 	ship_4 ai_ship_4_1;
 
+
+	// Adds the AI's ships to the vector
 	P2.player_ships.push_back(ai_ship_1_1);
 	P2.player_ships.push_back(ai_ship_2_1);
 	P2.player_ships.push_back(ai_ship_2_2);
@@ -280,22 +320,21 @@ game_master::game_master() {
 	P2.player_ships.push_back(ai_ship_3_2);
 	P2.player_ships.push_back(ai_ship_4_1);
 
+	// Placement of ships on board
 	placePlayerShip();
-
 	placeAiShipsRand();
 
-	printenemyboard();
 
+	// Game Loop
 	while (!game_ended) {
-		std::cout << "Player's Turn" << std::endl;
+		cout << "Player's Turn" << endl;
 		printBoards();
 		playerGuessPosition();
 		VictoryCheck();
 
-		std::cout << "AI's Turn" << std::endl;
+		cout << "AI's Turn" << endl;
 		aiGuessPosition();
 		VictoryCheck();
 	}
 	cout << "Thanks for playing";
-
 }
